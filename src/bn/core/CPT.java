@@ -316,13 +316,13 @@ A1 A2 A3  A1 A2 A3  A1 A2 A3  A1 A2 A3    A1 A2 A3  A1 A2 A3  A1 A2 A3  A1 A2 A3
 
 	System.out.println("expecting 0.5: " + cpt.get(e));
 
-	try {
+//	try {
 	    e.put(C, "b2");
 	    cpt.set(e, 0.5);
 	    cpt.print(System.out);
 	    System.out.println("expected NoSuchElementException!");
-	} catch (NoSuchElementException ex) {
-	    System.out.println("expected NoSuchElementException: " + ex);
-	}
+//	} catch (NoSuchElementException ex) {
+//	    System.out.println("expected NoSuchElementException: " + ex);
+//	}
     }
 }
