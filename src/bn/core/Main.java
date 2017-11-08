@@ -43,6 +43,6 @@ public class Main {
             i += 2;
         }
         System.out.println(ass);
-        System.out.println(enumber.ask(network, network.getVariableByName(argv[1]), ass).toString());
+        System.out.println("Query: " + argv[1] + " Exact inference result = " + enumber.ask(network, network.getVariableByName(argv[1]), ass).toString());
     }
 }
