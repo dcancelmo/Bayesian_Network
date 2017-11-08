@@ -10,6 +10,7 @@ package bn.core;
 import java.io.*;
 import java.util.*;
 
+import bn.inference.BNEnumeration;
 import bn.util.ArraySet;
 import bn.util.Printable;
 
@@ -356,5 +357,12 @@ public class BayesianNetwork {
 	network.add(C);
 	network.connect(A, givens, cpt);
 	network.print(System.out);
+	BNEnumeration enumber = new BNEnumeration();
+	Assignment ass = new Assignment();
+	ass.set(network.getVariableByName("J"), true);
+	ass.set(network.getVariableByName("M"), true);
+	System.out.println("ENNNNNNNÑD MEEEEEE");
+	enumber.ask(network, network.getVariableByName("B"), ass);
+
     }
 }
