@@ -23,55 +23,81 @@ public class BNEnumeration implements Inferencer {
 //        return q;
 //    }
 //
-////  function ENUMERATE-ALL(vars, e) returns a probability (a real number in [0,1])
-////  inputs: vars, a list of all the variables
-////  e, observed values for some set of variables E
-//    public double all(List<RandomVariable> vars, Assignment e, BayesianNetwork bn) {
-//        // if EMPTY(vars) then return 1.0
-//        if (vars.isEmpty()) return 1.0f;
-//        // Y ← FIRST(vars)
-//        RandomVariable y = vars.remove(0);
-//        // if Y is assigned a value (call it y) in e then
-//        if (e.containsValue(y)) {
-//        // return P(Y=y | values assigned to Y’s parents in e) × ENUMERATE-ALL(REST(vars), e)
-//            return bn.getProb(y, e) * all(vars, e, bn);
-//        } else {
-////            return ∑yi [P(Y=yi | values assigned to Y’s parents in e) × ENUMERATE-ALL(REST(vars), eyi)],
-////            where eyi is the evidence e plus the assignment Y=yi
+//  function ENUMERATE-ALL(vars, e) returns a probability (a real number in [0,1])
+//  inputs: vars, a list of all the variables
+//  e, observed values for some set of variables E
+    public float all(List<RandomVariable> vars, Assignment e, BayesianNetwork bn) {
+        // if EMPTY(vars) then return 1.0
+        if (vars.isEmpty()) return 1.0f;
+        // Y ← FIRST(vars)
+        RandomVariable y = vars.remove(0);
+        // if Y is assigned a value (call it y) in e then
+        if (e.containsValue(y)) {
+        // return P(Y=y | values assigned to Y’s parents in e) × ENUMERATE-ALL(REST(vars), e)
+            return (float) bn.getProb(y, e) * all(vars, e, bn); //Does this count as pointwise?
+        } else {
+//            return ∑yi [P(Y=yi | values assigned to Y’s parents in e) × ENUMERATE-ALL(REST(vars), eyi)],
+//            where eyi is the evidence e plus the assignment Y=yi
+            float yi = 0.0f;
+            Assignment assign;
+            for(Object value : y.getDomain()) {
+                Assignment temp = e.copy();
+                temp.put(y, value);
+                assign = temp;
+                yi += bn.getProb(y, assign) * all(vars, assign, bn); //Does this count as pointwise?
+            }
+            return yi;
+        }
+    }
+
+//    private Factor pointwiseProduct(List<Factor> factors) {
+//
+//        Factor product = factors.get(0);
+//        for (int i = 1; i < factors.size(); i++) {
+//            product = product.pointwiseProduct(factors.get(i));
 //        }
-//        return 0.0;
+//
+//        return product;
 //    }
 
     @Override
     public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e) {
-        Distribution result = new Distribution();
+//        Q(X )← a distribution over X , initially empty
+        Distribution result = new Distribution(X);
+//        for each value xi of X do
+        int i = 0;
         for (Object d : X.getDomain()) {
-            result.put(d, EnumerateAll(bn.getVariableList(), e, bn));
+            Assignment cpy = e.copy();
+            cpy.set(X, X.getDomain().get(i));
+//            Q(xi)← ENUMERATE-ALL(bn.VARS, exi ) where exi is e extended w
+            result.put(X.getDomain().get(i), all(bn.getVariableListTopologicallySorted(), cpy, bn));
+            i++;
         }
+//        return NORMALIZE(Q(X))
         result.normalize();
         return result;
     }
 
-    public double EnumerateAll(List<RandomVariable> vars, Assignment e, BayesianNetwork bn) {
-        if (vars.isEmpty()) return 1.0;
-        RandomVariable v = vars.get(0);
-        vars.remove(0);
-        if (bn.getProb(v, bn.)) {
+//    public double EnumerateAll(List<RandomVariable> vars, Assignment e, BayesianNetwork bn) {
+//        if (vars.isEmpty()) return 1.0;
+//        RandomVariable v = vars.get(0);
+//        vars.remove(0);
+//        if (bn.getProb(v, bn.)) {
+//
+//        }
+//    }
 
-        }
-    }
-
-    public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e) {
-        Distribution result = new Distribution();
-        Assignment[] truthTable = new Assignment[(int) (e.variableSet().size() + 1)];
-        for (int i = 0; i < truthTable.length; i++) {
-            String binaryString = String.format("%" + symbolList.size() + "s", Integer.toBinaryString(i)).replace(" ", "0");
-            supermodel[i] = new ModelC();
-            for (int p = 0; p < binaryString.length(); p++) {
-                supermodel[i].set(symbolList.get(p), '1' == binaryString.charAt(p));
-            }
-        }
-    }
+//    public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e) {
+//        Distribution result = new Distribution();
+//        Assignment[] truthTable = new Assignment[(int) (e.variableSet().size() + 1)];
+//        for (int i = 0; i < truthTable.length; i++) {
+//            String binaryString = String.format("%" + symbolList.size() + "s", Integer.toBinaryString(i)).replace(" ", "0");
+//            supermodel[i] = new ModelC();
+//            for (int p = 0; p < binaryString.length(); p++) {
+//                supermodel[i].set(symbolList.get(p), '1' == binaryString.charAt(p));
+//            }
+//        }
+//    }
 
 
 
