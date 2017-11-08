@@ -9,6 +9,7 @@ import bn.parser.XMLBIFParser;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class BNEnumeration implements Inferencer {
 
@@ -41,28 +42,60 @@ public class BNEnumeration implements Inferencer {
 //        return 0.0;
 //    }
 
-
     @Override
     public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e) {
+        Distribution result = new Distribution();
+        for (Object d : X.getDomain()) {
+            result.put(d, EnumerateAll(bn.getVariableList(), e, bn));
+        }
+        result.normalize();
+        return result;
+    }
+
+    public double EnumerateAll(List<RandomVariable> vars, Assignment e, BayesianNetwork bn) {
+        if (vars.isEmpty()) return 1.0;
+        RandomVariable v = vars.get(0);
+        vars.remove(0);
+        if (bn.getProb(v, bn.)) {
+
+        }
+    }
+
+    public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e) {
+        Distribution result = new Distribution();
+        Assignment[] truthTable = new Assignment[(int) (e.variableSet().size() + 1)];
+        for (int i = 0; i < truthTable.length; i++) {
+            String binaryString = String.format("%" + symbolList.size() + "s", Integer.toBinaryString(i)).replace(" ", "0");
+            supermodel[i] = new ModelC();
+            for (int p = 0; p < binaryString.length(); p++) {
+                supermodel[i].set(symbolList.get(p), '1' == binaryString.charAt(p));
+            }
+        }
+    }
+
+
+
+//    @Override
+//    public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e) {
 //        Distribution q = new Distribution(X);
 //        factors ← [for each variable v in bn.VARS, the CPT for v given e
 //        BigDecimal product = BigDecimal.valueOf(1);
-        List<BigDecimal> factors = new ArrayList<BigDecimal>();
-        for (RandomVariable var : bn.getVariableList()) {
-            System.out.print("var: "+var);
-            if (e.variableSet().contains(var)) {
-                System.out.println(" " + bn.getProb(var, e));
-            } else {
-                System.out.println(" Probability not found!");
-                System.out.println(e);
-            }
-        }
+//        List<BigDecimal> factors = new ArrayList<BigDecimal>();
+//        for (RandomVariable var : bn.getVariableList()) {
+//            System.out.print("var: "+var);
+//            if (e.variableSet().contains(var)) {
+//                System.out.println(" " + bn.getProb(var, e));
+//            } else {
+//                System.out.println(" Probability not found!");
+//                System.out.println(e);
+//            }
+//        }
 //        if (!var.equals(X) && !e.variableSet().contains(var)) {
 //
 //        }
 //        q.normalize();
 //        return q;
-        return null;
-    }
+//        return null;
+//    }
 
 }
