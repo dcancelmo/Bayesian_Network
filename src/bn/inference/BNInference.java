@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class BNEnumeration implements Inferencer {
+public class BNInference implements Inferencer {
 
     @Override
     public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e) {
@@ -21,7 +21,7 @@ public class BNEnumeration implements Inferencer {
         int i = 0;
         for (Object d : X.getDomain()) {
             Assignment cpy = e.copy();
-            cpy.set(X, X.getDomain().get(i));
+            cpy.set(X, d);
 //            Q(xi)← ENUMERATE-ALL(bn.VARS, exi ) where exi is e extended w
             result.put(X.getDomain().get(i), all(bn.getVariableListTopologicallySorted(), cpy, bn));
             i++;

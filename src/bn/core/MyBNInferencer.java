@@ -21,12 +21,14 @@ public class MyBNInferencer {
 //        network.print(System.out);
         BNEnumeration enumber = new BNEnumeration();
         Assignment ass = new Assignment();
+        System.out.println("Bayesian Network file used: " + filename);
         System.out.println("====Assignments====");
 //        ass.set(network.getVariableByName("B"), "true");
         for (int i = 2; i < argv.length; i += 2) {
             ass.set(network.getVariableByName(argv[i]), argv[i+1]);
         }
-//        System.out.println(ass);
+        System.out.println(ass);
+        System.out.println("====Results====");
         System.out.println("Query: " + argv[1] + " Exact inference result = " + enumber.ask(network, network.getVariableByName(argv[1]), ass).toString());
     }
 
