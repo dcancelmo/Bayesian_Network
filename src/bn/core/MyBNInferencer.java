@@ -13,22 +13,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class Main {
+public class MyBNInferencer {
     public static void main(String[] argv) throws IOException, ParserConfigurationException, SAXException {
         String filename = argv[0];
-        BayesianNetwork network;
-        if(filename.endsWith(".xml")) {
-            XMLBIFParser xbp = new XMLBIFParser();
-            network = xbp.readNetworkFromFile(filename);
-        } else if(filename.endsWith(".bif")) {
-            InputStream input = new FileInputStream(filename);
-            BIFLexer bl = new BIFLexer(input);
-            BIFParser bp = new BIFParser(bl);
-            network = bp.parseNetwork();
-        } else {
-            System.out.println("Invalid file format");
-            return;
-        }
+        BayesianNetwork network = parseNetwork(filename);
+        if (network == null) return;
 //        network.print(System.out);
         BNEnumeration enumber = new BNEnumeration();
         Assignment ass = new Assignment();
@@ -39,6 +28,20 @@ public class Main {
         }
 //        System.out.println(ass);
         System.out.println("Query: " + argv[1] + " Exact inference result = " + enumber.ask(network, network.getVariableByName(argv[1]), ass).toString());
-        System.out.println("Query: " + argv[1] + " Rejection sampling result = " + enumber.rejectionSampling(network.getVariableByName(argv[1]), ass, network, 10000));
+    }
+
+    public static BayesianNetwork parseNetwork(String filename) throws IOException, ParserConfigurationException, SAXException {
+        if(filename.endsWith(".xml")) {
+            XMLBIFParser xbp = new XMLBIFParser();
+            return xbp.readNetworkFromFile(filename);
+        } else if(filename.endsWith(".bif")) {
+            InputStream input = new FileInputStream(filename);
+            BIFLexer bl = new BIFLexer(input);
+            BIFParser bp = new BIFParser(bl);
+            return bp.parseNetwork();
+        } else {
+            System.out.println("Invalid file format");
+            return null;
+        }
     }
 }
