@@ -55,24 +55,64 @@ public class BNEnumeration implements Inferencer {
         }
     }
 
-    public float rejectionSampling(RandomVariable X, Assignment e, BayesianNetwork bn, int N) {
-        for (int j = 1; j < N; j++) {
-            Assignment x = priorSample(bn);
+    public Distribution rejectionSampling(RandomVariable X, Assignment e, BayesianNetwork bn, int N) {
+        Distribution estDistribution = new Distribution();
+        double total = 0.0;
+        double consistent = 0.0;
+        for (int j = 1; j < N; j++) {  //Sample N times
+            Assignment sample = priorSample(bn);
+            for (RandomVariable var : e.variableSet())
+                if (e.get(var).equals(sample.get(var))) {
+                    total += 1;
+                    if (sample.get(X).equals("true")) consistent += 1;
+                }
         }
+        estDistribution.put(X.getDomain().get(0), consistent/total);
+        estDistribution.put(X.getDomain().get(1), 1-(consistent/total));
+        estDistribution.normalize();
+        return estDistribution;
     }
 
     public Assignment priorSample(BayesianNetwork bn) {
 //        x← an event with n elements
         Assignment x = new Assignment();
+        x.set(bn.getVariableListTopologicallySorted().get(0), "true");
+        Random r = new Random();
 //        foreach variable Xi in X1,...,Xn do
         for (RandomVariable xi : bn.getVariableListTopologicallySorted()) {
-//            x[i] ← a random sample from P(Xi | parents(Xi))
-            x.set(xi, bn.getNodeForVariable(xi));
-
+            Double rVal = r.nextDouble();
+//            System.out.println(xi);
+//            System.out.println(bn.getNodeForVariable(xi).cpt);
+//            Assignment thisTableP = new Assignment();
+            x.set(xi, "true");
+            String rResult = (rVal > bn.getNodeForVariable(xi).cpt.get(x)) ? "true" : "false";
+//            System.out.println("x: "+x);
+//            System.out.println("Result: "+rResult);
+            x.set(xi, rResult);
+//            x.set(xi, bn.getNodeForVariable(xi));
+//            x[i] ← a random sample from P(Xi | parents(Xi)
         }
 //        return x
         return x;
     }
+
+//    for j = 1 to N do
+//      x← PRIOR-SAMPLE(bn)
+//      if x is consistent with e then
+//          N[x ] ←N[x ]+1 where x is the value of X in x
+//    return NORMALIZE(N)
+
+    //Rejection sampling for the rain/lawn example
+    //Repeat 100 times:
+    //Visit nodes topologically
+    //Sample from prior (always the first node visited)
+    //Sample from next node visited, given prior's value (aka given node's parents)
+    //Sample from next node visited, given prior's value (aka given node's parents)
+    //etc...
+    //Visit last node, sample with respect to parent's sampled values
+    //Tally that
+    //Reject if does not match given evidence
+    //Return tally over number of samples that meet evidence
 
 
 

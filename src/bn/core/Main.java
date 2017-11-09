@@ -29,20 +29,16 @@ public class Main {
             System.out.println("Invalid file format");
             return;
         }
-        network.print(System.out);
+//        network.print(System.out);
         BNEnumeration enumber = new BNEnumeration();
         Assignment ass = new Assignment();
-//        ass.set(network.getVariableByName(argv[2]), Boolean.parseBoolean(argv[3]));
-//        ass.set(network.getVariableByName(argv[4]), Boolean.parseBoolean(argv[5]));
-//        ass.set(network.getVariableByName(argv[2]), argv[3]);
-//        ass.set(network.getVariableByName(argv[4]), argv[5]);
         System.out.println("====Assignments====");
 //        ass.set(network.getVariableByName("B"), "true");
-        for (int i = 2; i < argv.length;) {
+        for (int i = 2; i < argv.length; i += 2) {
             ass.set(network.getVariableByName(argv[i]), argv[i+1]);
-            i += 2;
         }
-        System.out.println(ass);
+//        System.out.println(ass);
         System.out.println("Query: " + argv[1] + " Exact inference result = " + enumber.ask(network, network.getVariableByName(argv[1]), ass).toString());
+        System.out.println("Query: " + argv[1] + " Rejection sampling result = " + enumber.rejectionSampling(network.getVariableByName(argv[1]), ass, network, 10000));
     }
 }
