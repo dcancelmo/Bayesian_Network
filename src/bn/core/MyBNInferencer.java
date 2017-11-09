@@ -1,6 +1,6 @@
 package bn.core;
 
-import bn.inference.BNEnumeration;
+import bn.inference.BNInference;
 import bn.parser.BIFLexer;
 import bn.parser.BIFParser;
 import bn.parser.XMLBIFParser;
@@ -19,7 +19,7 @@ public class MyBNInferencer {
         BayesianNetwork network = parseNetwork(filename);
         if (network == null) return;
 //        network.print(System.out);
-        BNEnumeration enumber = new BNEnumeration();
+        BNInference enumber = new BNInference();
         Assignment ass = new Assignment();
         System.out.println("Bayesian Network file used: " + filename);
         System.out.println("====Assignments====");
