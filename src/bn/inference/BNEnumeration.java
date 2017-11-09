@@ -81,13 +81,13 @@ public class BNEnumeration implements Inferencer {
 //        foreach variable Xi in X1,...,Xn do
         for (RandomVariable xi : bn.getVariableListTopologicallySorted()) {
             Double rVal = r.nextDouble();
-//            System.out.println(xi);
-//            System.out.println(bn.getNodeForVariable(xi).cpt);
+            System.out.println(xi);
+            System.out.println(bn.getNodeForVariable(xi).cpt);
 //            Assignment thisTableP = new Assignment();
             x.set(xi, "true");
             String rResult = (rVal > bn.getNodeForVariable(xi).cpt.get(x)) ? "true" : "false";
 //            System.out.println("x: "+x);
-//            System.out.println("Result: "+rResult);
+            System.out.println("Result: "+rResult);
             x.set(xi, rResult);
 //            x.set(xi, bn.getNodeForVariable(xi));
 //            x[i] ← a random sample from P(Xi | parents(Xi)
