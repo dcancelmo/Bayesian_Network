@@ -81,18 +81,57 @@ public class BNEnumeration implements Inferencer {
 //        foreach variable Xi in X1,...,Xn do
         for (RandomVariable xi : bn.getVariableListTopologicallySorted()) {
             Double rVal = r.nextDouble();
-            System.out.println(xi);
-            System.out.println(bn.getNodeForVariable(xi).cpt);
+//            System.out.println(xi);
+//            System.out.println(bn.getNodeForVariable(xi).cpt);
 //            Assignment thisTableP = new Assignment();
             x.set(xi, "true");
             String rResult = (rVal > bn.getNodeForVariable(xi).cpt.get(x)) ? "true" : "false";
 //            System.out.println("x: "+x);
-            System.out.println("Result: "+rResult);
+//            System.out.println("Result: "+rResult);
             x.set(xi, rResult);
 //            x.set(xi, bn.getNodeForVariable(xi));
 //            x[i] ← a random sample from P(Xi | parents(Xi)
         }
 //        return x
+        return x;
+    }
+
+    double weightRet = 0.0;
+
+    public Distribution likelihoodWeighting(RandomVariable X, Assignment e, BayesianNetwork bn, int N) {
+        Distribution estDistribution = new Distribution();
+        double total = 0.0;
+        double weight = 0.0;
+        for (int j = 1; j < N; j++) {  //Sample N times
+            Assignment sample = weightedSample(bn, e);
+            total += 1;
+            if (sample.get(X).equals("true")) weight += weightRet;
+        }
+        estDistribution.put(X.getDomain().get(0), weight/total);
+        estDistribution.put(X.getDomain().get(1), 1-(weight/total));
+        estDistribution.normalize();
+        return estDistribution;
+    }
+
+    public Assignment weightedSample(BayesianNetwork bn, Assignment e) {
+        double tempW = 1.0;
+        Assignment x = e.copy();
+        x.set(bn.getVariableListTopologicallySorted().get(0), "true");
+        Random r = new Random();
+        for (RandomVariable xi : bn.getVariableListTopologicallySorted()) {
+            if (e.containsValue(xi)) {
+                tempW = tempW * bn.getProb(xi, e);
+            } else {
+                Double rVal = r.nextDouble();
+//                System.out.println(xi);
+//                System.out.println(bn.getNodeForVariable(xi).cpt);
+                x.set(xi, "true");
+                String rResult = (rVal > bn.getNodeForVariable(xi).cpt.get(x)) ? "true" : "false";
+//                System.out.println("Result: "+rResult);
+                x.set(xi, rResult);
+            }
+        }
+        weightRet = tempW;
         return x;
     }
 
