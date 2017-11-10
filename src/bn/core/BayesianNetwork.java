@@ -10,7 +10,6 @@ package bn.core;
 import java.io.*;
 import java.util.*;
 
-import bn.inference.BNEnumeration;
 import bn.util.ArraySet;
 import bn.util.Printable;
 

@@ -6,6 +6,8 @@ import bn.core.Distribution;
 import bn.core.RandomVariable;
 import bn.parser.XMLBIFParser;
 
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.element.VariableElement;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,42 +18,61 @@ public class BNInference implements Inferencer {
     @Override
     public Distribution ask(BayesianNetwork bn, RandomVariable X, Assignment e) {
 //        Q(X )← a distribution over X , initially empty
-        Distribution result = new Distribution(X);
+        Distribution queryDistribution = new Distribution(X);
 //        for each value xi of X do
         int i = 0;
         for (Object d : X.getDomain()) {
-            Assignment cpy = e.copy();
-            cpy.set(X, d);
+//            Assignment cpy = e.copy();
+//            System.out.println("Adding "+d+" to e for "+X.getName()+".");
+            Assignment temp = e.copy();
+            temp.set(X, d);
 //            Q(xi)← ENUMERATE-ALL(bn.VARS, exi ) where exi is e extended w
-            result.put(X.getDomain().get(i), all(bn.getVariableListTopologicallySorted(), cpy, bn));
+//            System.out.println("Starting all. "+X.getName()+" is "+temp.get(X));
+            double result = all(bn.getVariableListTopologicallySorted(), temp, bn);
+            queryDistribution.put(X.getDomain().get(i), result);
             i++;
         }
 //        return NORMALIZE(Q(X))
-        result.normalize();
-        return result;
+        queryDistribution.normalize();
+        return queryDistribution;
     }
 
-    public float all(List<RandomVariable> vars, Assignment e, BayesianNetwork bn) {
+    public double all(List<RandomVariable> vars, Assignment e, BayesianNetwork bn) {
 //        if EMPTY(vars) then return 1.0
         if (vars.isEmpty()) return 1.0f;
 //        Y ← FIRST(vars)
-        RandomVariable y = vars.remove(0);
+        RandomVariable v = vars.remove(0);
         // if Y is assigned a value (call it y) in e then
-        if (e.containsValue(y)) {
+//        System.out.println("Is "+v+" evidence? "+e.containsKey(v));
+        if (e.containsKey(v)) { //If v is evidence
 //        return P(Y=y | values assigned to Y’s parents in e) × ENUMERATE-ALL(REST(vars), e)
-            return (float) bn.getProb(y, e) * all(vars, e, bn); //Does this count as pointwise?
+//            System.out.println("Found evidence term");
+            return bn.getProb(v, e) * all(vars, e, bn);
         } else {
 //            return ∑yi [P(Y=yi | values assigned to Y’s parents in e) × ENUMERATE-ALL(REST(vars), eyi)],
 //            where eyi is the evidence e plus the assignment Y=yi
-            float yi = 0.0f;
-            Assignment assign;
-            for(Object value : y.getDomain()) {
-                Assignment temp = e.copy();
-                temp.put(y, value);
-                assign = temp;
-                yi += bn.getProb(y, assign) * all(vars, assign, bn); //Does this count as pointwise?
+            double sum = 0.0;
+            for (Object vi : v.getDomain()) {
+//                Assignment temp = e.copy();
+                e.set(v, vi);
+//                System.out.println("V is: "+v+"; e is "+e+" -> "+bn.getProb(v, e));
+                double prob = bn.getProb(v, e);
+                sum += prob * all(vars, e, bn); //May be wrong
+//                System.out.println("Temp sum: " + sum);
             }
-            return yi;
+//            System.out.println("FINISH: "+sum);
+
+            return sum;
+
+//            float yi = 0.0f;
+//            Assignment assign;
+//            for(Object value : y.getDomain()) {
+//                Assignment temp = e.copy();
+//                temp.put(y, value);
+//                assign = temp;
+//                yi += bn.getProb(y, assign) * all(vars, assign, bn); //Does this count as pointwise?
+//            }
+//            return yi;
         }
     }
 
@@ -134,6 +155,31 @@ public class BNInference implements Inferencer {
         weightRet = tempW;
         return x;
     }
+
+//    public Distribution gibbsSample(RandomVariable X, Assignment e, BayesianNetwork bn, int N) {
+//        Distribution estDistributionN = new Distribution();
+//        Assignment currStatex = e.copy();
+//        List<RandomVariable> Z = bn.getVariableListTopologicallySorted();
+//        double weight = 0.0;
+//        for (int j = 1; j < N; j++) {  //Sample N times
+//            for (RandomVariable zi : Z) {
+//                if (!e.containsValue(zi)) {
+//                    Z.set(Z.indexOf(zi), );
+////                    if (sample.get(X).equals("true")) weight += 1;
+//                }
+//            }
+//        }
+//        estDistributionN.put(X.getDomain().get(0), weight/total);
+//        estDistributionN.put(X.getDomain().get(1), 1-(weight/total));
+//        estDistributionN.normalize();
+//        return estDistributionN;
+//    }
+
+//    for j = 1 to N do
+//          for each Zi in Z do
+//              set the value of Zi in x by sampling from P(Zi|mb(Zi))
+//              N[x ] ←N[x ]+1 where x is the value of X in x
+//    return NORMALIZE(N)
 
 //    for j = 1 to N do
 //      x← PRIOR-SAMPLE(bn)
