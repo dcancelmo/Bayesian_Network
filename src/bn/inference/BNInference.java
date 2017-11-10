@@ -29,7 +29,7 @@ public class BNInference implements Inferencer {
 //            Q(xi)← ENUMERATE-ALL(bn.VARS, exi ) where exi is e extended w
 //            System.out.println("Starting all. "+X.getName()+" is "+temp.get(X));
             double result = all(bn.getVariableListTopologicallySorted(), temp, bn);
-            queryDistribution.put(X.getDomain().get(i), result);
+            queryDistribution.put(X.getDomain().get(i), 1-result);
             i++;
         }
 //        return NORMALIZE(Q(X))
