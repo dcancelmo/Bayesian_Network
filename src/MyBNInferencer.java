@@ -1,9 +1,9 @@
-package bn.core;
-
 import bn.inference.BNInference;
 import bn.parser.BIFLexer;
 import bn.parser.BIFParser;
 import bn.parser.XMLBIFParser;
+import bn.core.Assignment;
+import bn.core.BayesianNetwork;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.omg.CORBA.DynAnyPackage.Invalid;
 import org.xml.sax.SAXException;

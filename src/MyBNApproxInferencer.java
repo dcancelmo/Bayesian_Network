@@ -1,9 +1,9 @@
-package bn.core;
-
 import bn.inference.BNInference;
 import bn.parser.BIFLexer;
 import bn.parser.BIFParser;
 import bn.parser.XMLBIFParser;
+import bn.core.Assignment;
+import bn.core.BayesianNetwork;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
